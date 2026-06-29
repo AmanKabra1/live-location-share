@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+locshare.db
+*.db
+.git
+.gitignore
+.cursor
+README.md
+DEPLOY.md

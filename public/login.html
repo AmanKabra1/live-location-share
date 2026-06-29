@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon.svg">
+  <title>Log in — LocShare</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <a href="/" class="logo logo-center">
+      <span class="logo-icon">📍</span>
+      <span>LocShare</span>
+    </a>
+    <h1>Welcome back</h1>
+    <p class="auth-sub">Sign in to view and share live locations</p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="error" class="error-msg hidden"></div>
+      <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Sign in</button>
+    </form>
+
+    <p class="auth-footer">Don't have an account? <a href="/register.html">Create one</a></p>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/pwa.js"></script>
+  <script>
+    redirectIfLoggedIn();
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const errEl = document.getElementById('error');
+      errEl.classList.add('hidden');
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+
+      try {
+        const data = await api('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+          })
+        });
+        setSession(data.token, data.user);
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+  </script>
+</body>
+</html>

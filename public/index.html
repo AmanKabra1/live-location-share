@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="description" content="Share your live location every 3 hours with people you trust.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon.svg">
+  <title>LocShare — Live Location Sharing</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="landing">
+  <nav class="nav">
+    <a href="/" class="logo">
+      <span class="logo-icon">📍</span>
+      <span>LocShare</span>
+    </a>
+    <div class="nav-links">
+      <a href="/login.html" class="btn btn-ghost">Log in</a>
+      <a href="/register.html" class="btn btn-primary">Get started</a>
+    </div>
+  </nav>
+
+  <main class="hero">
+    <div class="hero-content">
+      <div class="badge">Trusted live location sharing</div>
+      <h1>Stay connected.<br>Share where you are.</h1>
+      <p class="hero-sub">
+        Connect with family, friends, or teammates and automatically share your live location every 3 hours — so the people who matter always know you're safe.
+      </p>
+      <div class="hero-actions">
+        <a href="/register.html" class="btn btn-primary btn-lg">Create free account</a>
+        <a href="/login.html" class="btn btn-outline btn-lg">Sign in</a>
+      </div>
+      <ul class="features-list">
+        <li>🔗 Connect instantly with a 6-digit share code</li>
+        <li>🗺️ See everyone on an interactive map</li>
+        <li>📲 Install as app on phone — no Play Store needed</li>
+        <li>⏰ Auto-updates every 3 hours + reminder notifications</li>
+        <li>🔒 Private — only your connections see your location</li>
+      </ul>
+    </div>
+    <div class="hero-visual">
+      <div class="phone-mock">
+        <div class="phone-screen">
+          <div class="mock-map"></div>
+          <div class="mock-pin pin-1"></div>
+          <div class="mock-pin pin-2"></div>
+          <div class="mock-pin pin-you"></div>
+          <div class="mock-label">You · Updated 12m ago</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section class="how-it-works">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Create account</h3>
+        <p>Sign up and get your unique share code.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Connect</h3>
+        <p>Enter a friend's share code to link accounts.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Share location</h3>
+        <p>Your location is sent automatically every 3 hours.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>LocShare — Private location sharing for people you trust.</p>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/pwa.js"></script>
+  <script>redirectIfLoggedIn();</script>
+</body>
+</html>

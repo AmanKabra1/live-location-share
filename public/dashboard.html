@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="description" content="Share your live location every 3 hours with people you trust.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LocShare">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon.svg">
+  <title>Dashboard — LocShare</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-page">
+  <div id="pwaInstallBanner" class="pwa-banner hidden">
+    <div class="pwa-banner-text">
+      <strong>Install LocShare</strong>
+      <span>Add to home screen for app-like experience on mobile</span>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="installPWA()">Install</button>
+    <button class="btn btn-ghost btn-sm" onclick="hideInstallBanner()">✕</button>
+  </div>
+
+  <header class="dash-header">
+    <a href="/" class="logo">
+      <span class="logo-icon">📍</span>
+      <span>LocShare</span>
+    </a>
+    <div class="header-right">
+      <span class="user-greeting">Hi, <strong id="userName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Log out</button>
+    </div>
+  </header>
+
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <section class="panel pwa-panel" id="pwaTips">
+        <h2>Mobile app (free)</h2>
+        <p class="panel-desc">Install LocShare on your phone — no Play Store needed.</p>
+        <button class="btn btn-outline btn-full btn-sm" onclick="installPWA()">Add to Home Screen</button>
+        <button class="btn btn-ghost btn-full btn-sm" id="notifyBtn" style="margin-top:0.5rem">Enable reminders</button>
+      </section>
+
+      <section class="panel">
+        <h2>Your share code</h2>
+        <p class="panel-desc">Give this code to someone so they can connect with you.</p>
+        <div class="share-code-box">
+          <span id="shareCode">------</span>
+          <button class="btn btn-ghost btn-sm" id="copyCodeBtn" title="Copy code">Copy</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Connect with someone</h2>
+        <form id="connectForm" class="connect-form">
+          <input type="text" id="connectCode" placeholder="Enter their code" maxlength="6" class="code-input" autocomplete="off">
+          <button type="submit" class="btn btn-primary">Connect</button>
+        </form>
+        <div id="connectMsg" class="toast-msg hidden"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Location sharing</h2>
+        <div class="share-status" id="shareStatus">
+          <span class="status-dot idle"></span>
+          <span>Waiting to share…</span>
+        </div>
+        <p class="panel-desc">Your location is sent automatically every <strong>3 hours</strong>. Keep LocShare open or installed on your phone.</p>
+        <button class="btn btn-primary btn-full" id="shareNowBtn">Share location now</button>
+        <p class="next-share" id="nextShare">Next auto-share: —</p>
+      </section>
+
+      <section class="panel connections-panel">
+        <h2>Connections <span class="count" id="connCount">0</span></h2>
+        <ul id="connectionsList" class="connections-list">
+          <li class="empty-state">No connections yet. Share your code above!</li>
+        </ul>
+      </section>
+    </aside>
+
+    <main class="map-area">
+      <div id="map"></div>
+      <div class="map-legend">
+        <span><i class="dot you"></i> You</span>
+        <span><i class="dot other"></i> Connection</span>
+        <span><i class="dot stale"></i> Stale (&gt;3h)</span>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/pwa.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
