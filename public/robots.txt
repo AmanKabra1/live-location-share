@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /login.html
+Allow: /register.html
+Disallow: /dashboard.html
+Disallow: /api/
