@@ -274,6 +274,36 @@ a:hover { text-decoration: underline; }
   border-color: var(--primary);
 }
 
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:hover,
+.field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0px 1000px var(--bg) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.field .input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.field .input-wrap input {
+  padding-right: 2.75rem;
+}
+.btn-eye {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 1rem;
+  line-height: 1;
+  user-select: none;
+}
+.btn-eye:hover { color: var(--text); }
+
 .error-msg {
   background: rgba(239,68,68,0.12);
   color: var(--error);
@@ -406,6 +436,7 @@ a:hover { text-decoration: underline; }
 }
 .toast-msg.success { background: rgba(16,185,129,0.15); color: var(--success); }
 .toast-msg.error { background: rgba(239,68,68,0.15); color: var(--error); }
+.toast-msg.info { background: rgba(59,130,246,0.15); color: var(--primary); }
 
 .share-status {
   display: flex;
@@ -456,6 +487,8 @@ a:hover { text-decoration: underline; }
 .conn-name { font-weight: 600; font-size: 0.9rem; display: block; }
 .conn-time { font-size: 0.78rem; color: var(--text-muted); }
 .conn-item.active .conn-time { color: var(--success); }
+.conn-actions { display: flex; align-items: center; gap: 0.15rem; }
+.btn-locate { font-size: 1rem; }
 
 .btn-icon {
   background: none;

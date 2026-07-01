@@ -143,7 +143,10 @@ function renderConnectionsList(connections) {
           <span class="conn-name">${escapeHtml(c.username)}</span>
           <span class="conn-time">${hasLoc ? timeAgo(c.recorded_at) : 'No location yet'}</span>
         </div>
-        <button class="btn-icon" onclick="removeConnection('${c.id}', '${escapeHtml(c.username)}')" title="Remove">✕</button>
+        <div class="conn-actions">
+          ${hasLoc ? `<button class="btn-icon btn-locate" onclick="flyToConnection('${c.id}')" title="Show on map">📍</button>` : ''}
+          <button class="btn-icon" onclick="removeConnection('${c.id}', '${escapeHtml(c.username)}')" title="Remove">✕</button>
+        </div>
       </li>
     `;
   }).join('');
@@ -255,12 +258,12 @@ function getCurrentPosition() {
     }
     navigator.geolocation.getCurrentPosition(resolve, (err) => {
       const msgs = {
-        1: 'Location permission denied. Please allow location access.',
-        2: 'Unable to determine your location.',
-        3: 'Location request timed out.'
+        1: 'Location permission denied. Please allow location access in your browser settings.',
+        2: 'Unable to determine your location. Try moving to a better signal area.',
+        3: 'Location request timed out. Please try again.'
       };
       reject(new Error(msgs[err.code] || 'Failed to get location'));
-    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+    }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 60000 });
   });
 }
 
@@ -336,8 +339,9 @@ async function handleConnect(e) {
     input.value = '';
     await loadConnections();
   } catch (err) {
-    msg.textContent = err.message;
-    msg.className = 'toast-msg error';
+    const alreadyConnected = err.message.toLowerCase().includes('already connected');
+    msg.textContent = alreadyConnected ? 'You are already connected with this person.' : err.message;
+    msg.className = alreadyConnected ? 'toast-msg info' : 'toast-msg error';
   }
   msg.classList.remove('hidden');
 }
@@ -361,6 +365,13 @@ function copyShareCode() {
   });
 }
 
+function flyToConnection(id) {
+  const marker = markers[id];
+  if (!marker) return;
+  map.flyTo(marker.getLatLng(), 14, { duration: 1.2 });
+  marker.openPopup();
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
@@ -370,3 +381,4 @@ function escapeHtml(str) {
 init();
 
 window.removeConnection = removeConnection;
+window.flyToConnection = flyToConnection;

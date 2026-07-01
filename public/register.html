@@ -32,7 +32,10 @@
       </div>
       <div class="field">
         <label for="password">Password</label>
-        <input type="password" id="password" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password">
+        <div class="input-wrap">
+          <input type="password" id="password" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password">
+          <button type="button" class="btn-eye" id="togglePassword" aria-label="Show password">👁</button>
+        </div>
       </div>
       <div id="error" class="error-msg hidden"></div>
       <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Create account</button>
@@ -45,6 +48,13 @@
   <script src="/js/pwa.js"></script>
   <script>
     redirectIfLoggedIn();
+
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const input = document.getElementById('password');
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      this.textContent = show ? '🙈' : '👁';
+    });
 
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();

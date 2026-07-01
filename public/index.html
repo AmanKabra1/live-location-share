@@ -7,14 +7,613 @@
   <meta name="description" content="Share your live location every 3 hours with people you trust.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon.svg">
   <title>LocShare — Live Location Sharing</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ── Landing page overrides & new styles ── */
+    .landing {
+      background: #080e17;
+      overflow-x: hidden;
+    }
+
+    /* Floating background pins */
+    .bg-pins {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bg-pin {
+      position: absolute;
+      font-size: 1.4rem;
+      opacity: 0;
+      animation: floatPin 12s ease-in-out infinite;
+    }
+    @keyframes floatPin {
+      0%   { opacity: 0; transform: translateY(0) scale(0.8); }
+      15%  { opacity: 0.18; }
+      85%  { opacity: 0.18; }
+      100% { opacity: 0; transform: translateY(-80px) scale(1.1); }
+    }
+
+    /* Nav */
+    .nav {
+      position: relative;
+      z-index: 10;
+      padding: 1.25rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 2.5rem; right: 2.5rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(59,130,246,0.3), transparent);
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2.5rem 5rem;
+      align-items: center;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.35);
+      color: #10b981;
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 1.4rem;
+      text-transform: uppercase;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes livePulse {
+      0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(16,185,129,0); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      line-height: 1.12;
+      font-weight: 900;
+      margin-bottom: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+    .grad-text {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradShift 4s ease infinite;
+    }
+    @keyframes gradShift {
+      0%,100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-sub {
+      color: #8b9cb3;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 500px;
+      margin-bottom: 2rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .btn-primary-glow {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff;
+      padding: 0.85rem 1.85rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+    }
+    .btn-primary-glow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(59,130,246,0.5);
+      text-decoration: none;
+      color: #fff;
+    }
+    .btn-ghost-hero {
+      background: rgba(255,255,255,0.05);
+      color: #e8edf4;
+      padding: 0.85rem 1.85rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.12);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .btn-ghost-hero:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .features-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .features-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.92rem;
+      color: #8b9cb3;
+    }
+    .features-list li span.fi {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* Phone mockup */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .phone-wrap {
+      position: relative;
+    }
+    .phone-glow {
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(ellipse at center, rgba(59,130,246,0.18) 0%, transparent 70%);
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    .phone-mock {
+      position: relative;
+      z-index: 1;
+      width: 270px;
+      background: linear-gradient(145deg, #1e2a3a, #141e2c);
+      border-radius: 36px;
+      padding: 10px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.08),
+        0 30px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .phone-notch {
+      width: 90px; height: 22px;
+      background: #0a1018;
+      border-radius: 12px;
+      margin: 0 auto 6px;
+    }
+    .phone-screen {
+      position: relative;
+      height: 430px;
+      border-radius: 26px;
+      overflow: hidden;
+      background: #0f1923;
+    }
+
+    /* SVG Map styles */
+    .map-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .map-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 10px 12px 8px;
+      background: linear-gradient(180deg, rgba(15,25,35,0.95) 60%, transparent);
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .map-app-name {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #e8edf4;
+      letter-spacing: 0.08em;
+    }
+    .map-live-tag {
+      font-size: 0.58rem;
+      background: rgba(16,185,129,0.2);
+      border: 1px solid rgba(16,185,129,0.4);
+      color: #10b981;
+      padding: 2px 7px;
+      border-radius: 8px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    /* Animated map pins */
+    .map-pin-group { position: absolute; z-index: 4; }
+    .map-pin-group.you   { bottom: 160px; left: 105px; }
+    .map-pin-group.alex  { top: 90px; left: 55px; }
+    .map-pin-group.priya { top: 120px; right: 45px; }
+
+    .pin-pulse-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      animation: pinRing 2.2s ease-out infinite;
+    }
+    .pin-pulse-ring.green { border: 2px solid rgba(16,185,129,0.7); }
+    .pin-pulse-ring.blue  { border: 2px solid rgba(59,130,246,0.7); animation-delay: 0.4s; }
+    .pin-pulse-ring.amber { border: 2px solid rgba(245,158,11,0.7);  animation-delay: 0.8s; }
+    @keyframes pinRing {
+      0%   { width: 20px; height: 20px; opacity: 0.9; }
+      100% { width: 52px; height: 52px; opacity: 0; }
+    }
+
+    .pin-dot {
+      width: 20px; height: 20px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      border: 2px solid #fff;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+    .pin-dot.green { background: #10b981; }
+    .pin-dot.blue  { background: #3b82f6; }
+    .pin-dot.amber { background: #f59e0b; }
+    .pin-dot span {
+      transform: rotate(45deg);
+      font-size: 7px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .pin-label {
+      position: absolute;
+      top: -22px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15,25,35,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #e8edf4;
+      font-size: 0.55rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    /* Info card on phone */
+    .map-info-card {
+      position: absolute;
+      bottom: 12px; left: 12px; right: 12px;
+      background: rgba(20,32,48,0.96);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 10px 12px;
+      z-index: 5;
+      backdrop-filter: blur(10px);
+    }
+    .mic-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .mic-title { font-size: 0.62rem; font-weight: 700; color: #e8edf4; }
+    .mic-badge {
+      font-size: 0.52rem;
+      background: rgba(16,185,129,0.2);
+      color: #10b981;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-weight: 700;
+    }
+    .mic-persons {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .mic-person {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .mic-avatar {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      font-size: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .mic-name { font-size: 0.58rem; font-weight: 600; color: #e8edf4; flex: 1; }
+    .mic-time { font-size: 0.52rem; color: #8b9cb3; }
+    .mic-dot-live {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: livePulse 1.5s infinite;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto 1rem;
+      padding: 0 2.5rem;
+    }
+    .stats-inner {
+      display: flex;
+      justify-content: space-around;
+      gap: 1rem;
+      background: rgba(26,35,50,0.7);
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: 16px;
+      padding: 1.4rem 2rem;
+      backdrop-filter: blur(10px);
+    }
+    .stat-item {
+      text-align: center;
+      flex: 1;
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .stat-label { font-size: 0.78rem; color: #8b9cb3; font-weight: 500; }
+    .stat-divider {
+      width: 1px;
+      background: rgba(255,255,255,0.08);
+      align-self: stretch;
+    }
+
+    /* Features section */
+    .features-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2.5rem;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #3b82f6;
+      margin-bottom: 0.65rem;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      margin-bottom: 2.5rem;
+      letter-spacing: -0.01em;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    .feat-card {
+      background: rgba(26,35,50,0.6);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      cursor: default;
+    }
+    .feat-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59,130,246,0.35);
+      box-shadow: 0 12px 40px rgba(59,130,246,0.12);
+    }
+    .feat-icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.85rem;
+      display: block;
+    }
+    .feat-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .feat-card p {
+      font-size: 0.83rem;
+      color: #8b9cb3;
+      line-height: 1.55;
+    }
+
+    /* How it works */
+    .how-it-works {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 0 2.5rem 1rem;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: calc(16.66% + 12px); right: calc(16.66% + 12px);
+      height: 2px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+      z-index: 0;
+    }
+    .step {
+      background: rgba(26,35,50,0.6);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 1.75rem 1.25rem 1.5rem;
+      border-radius: 16px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.25s, border-color 0.25s;
+    }
+    .step:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59,130,246,0.3);
+    }
+    .step-num {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      margin: 0 auto 1rem;
+      box-shadow: 0 4px 14px rgba(59,130,246,0.4);
+    }
+    .step h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .step p { font-size: 0.83rem; color: #8b9cb3; line-height: 1.5; }
+
+    /* CTA section */
+    .cta-section {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 3rem auto 4rem;
+      padding: 0 2.5rem;
+      text-align: center;
+    }
+    .cta-card {
+      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.12));
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      backdrop-filter: blur(10px);
+    }
+    .cta-card h2 {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+    .cta-card p {
+      color: #8b9cb3;
+      margin-bottom: 1.75rem;
+      font-size: 0.95rem;
+    }
+    .cta-actions { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; }
+
+    /* Footer */
+    .footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 1.5rem 2rem;
+      color: #4a5a6e;
+      font-size: 0.82rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; text-align: center; padding: 2.5rem 1.5rem 3rem; }
+      .hero-sub, .hero-actions, .features-list { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .features-list li { justify-content: center; }
+      .hero-visual { order: -1; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .stats-inner { flex-wrap: wrap; gap: 1.25rem; }
+      .stat-divider { display: none; }
+      .steps::before { display: none; }
+      .nav { padding: 1rem 1.5rem; }
+      .steps { grid-template-columns: 1fr; gap: 1rem; }
+      .features-section, .how-it-works, .stats-bar, .cta-section { padding: 0 1.5rem; }
+    }
+    @media (max-width: 560px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .phone-mock { width: 240px; }
+      .phone-screen { height: 380px; }
+      .map-pin-group.you { bottom: 140px; left: 88px; }
+    }
+  </style>
 </head>
 <body class="landing">
+
+  <!-- Floating background pins -->
+  <div class="bg-pins" id="bgPins"></div>
+
+  <!-- Nav -->
   <nav class="nav">
     <a href="/" class="logo">
       <span class="logo-icon">📍</span>
@@ -22,59 +621,298 @@
     </a>
     <div class="nav-links">
       <a href="/login.html" class="btn btn-ghost">Log in</a>
-      <a href="/register.html" class="btn btn-primary">Get started</a>
+      <a href="/register.html" class="btn-primary-glow" style="padding:0.5rem 1.1rem;font-size:0.9rem;border-radius:8px;">Get started</a>
     </div>
   </nav>
 
+  <!-- Hero -->
   <main class="hero">
     <div class="hero-content">
-      <div class="badge">Trusted live location sharing</div>
-      <h1>Stay connected.<br>Share where you are.</h1>
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        Live location sharing
+      </div>
+      <h1>Know where<br>your people are,<br><span class="grad-text">always.</span></h1>
       <p class="hero-sub">
-        Connect with family, friends, or teammates and automatically share your live location every 3 hours — so the people who matter always know you're safe.
+        Connect with family and friends using a simple 6-digit code. Your location auto-shares every 3 hours — private, free, and works right from your phone.
       </p>
       <div class="hero-actions">
-        <a href="/register.html" class="btn btn-primary btn-lg">Create free account</a>
-        <a href="/login.html" class="btn btn-outline btn-lg">Sign in</a>
+        <a href="/register.html" class="btn-primary-glow">
+          <span>Create free account</span>
+          <span>→</span>
+        </a>
+        <a href="/login.html" class="btn-ghost-hero">Sign in</a>
       </div>
       <ul class="features-list">
-        <li>🔗 Connect instantly with a 6-digit share code</li>
-        <li>🗺️ See everyone on an interactive map</li>
-        <li>📲 Install as app on phone — no Play Store needed</li>
-        <li>⏰ Auto-updates every 3 hours + reminder notifications</li>
-        <li>🔒 Private — only your connections see your location</li>
+        <li><span class="fi">🔗</span> 6-digit share code — no phone number needed</li>
+        <li><span class="fi">🗺️</span> See everyone live on an interactive map</li>
+        <li><span class="fi">📲</span> Install on phone like an app — no Play Store</li>
+        <li><span class="fi">🔒</span> Private — only your connections see your location</li>
+        <li><span class="fi">⚡</span> 100% free, no ads, no hidden costs</li>
       </ul>
     </div>
+
+    <!-- Phone mockup with SVG map -->
     <div class="hero-visual">
-      <div class="phone-mock">
-        <div class="phone-screen">
-          <div class="mock-map"></div>
-          <div class="mock-pin pin-1"></div>
-          <div class="mock-pin pin-2"></div>
-          <div class="mock-pin pin-you"></div>
-          <div class="mock-label">You · Updated 12m ago</div>
-        </div>
-      </div>
-    </div>
+      <div class="phone-wrap">
+        <div class="phone-glow"></div>
+        <div class="phone-mock">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+
+            <!-- Map header -->
+            <div class="map-header">
+              <span class="map-app-name">📍 LOCSHARE</span>
+              <span class="map-live-tag">● LIVE</span>
+            </div>
+
+            <!-- SVG dark map -->
+            <svg class="map-svg" viewBox="0 0 270 430" xmlns="http://www.w3.org/2000/svg">
+              <!-- Base -->
+              <rect width="270" height="430" fill="#0f1923"/>
+
+              <!-- Water area -->
+              <rect x="0" y="310" width="80" height="120" fill="#0d1e32" rx="0"/>
+              <rect x="0" y="320" width="65" height="110" fill="#0f2340" rx="4"/>
+
+              <!-- Parks -->
+              <rect x="170" y="30" width="100" height="85" fill="#0f2216" rx="4"/>
+              <rect x="175" y="35" width="90" height="75" fill="#122918" rx="3"/>
+              <rect x="40" y="240" width="60" height="50" fill="#0f2216" rx="3"/>
+
+              <!-- Building blocks — fill city areas -->
+              <!-- Top-left quadrant -->
+              <rect x="8" y="35" width="48" height="30" fill="#141f2e" rx="3"/>
+              <rect x="8" y="72" width="22" height="22" fill="#16222f" rx="2"/>
+              <rect x="34" y="72" width="22" height="22" fill="#141f2e" rx="2"/>
+              <rect x="8" y="100" width="48" height="28" fill="#16222f" rx="3"/>
+              <rect x="8" y="134" width="22" height="20" fill="#141f2e" rx="2"/>
+              <rect x="34" y="134" width="22" height="20" fill="#16222f" rx="2"/>
+              <!-- Center area -->
+              <rect x="70" y="35" width="42" height="30" fill="#16222f" rx="3"/>
+              <rect x="70" y="72" width="18" height="22" fill="#141f2e" rx="2"/>
+              <rect x="92" y="72" width="18" height="22" fill="#16222f" rx="2"/>
+              <rect x="70" y="100" width="42" height="28" fill="#141f2e" rx="3"/>
+              <rect x="70" y="134" width="18" height="20" fill="#16222f" rx="2"/>
+              <rect x="92" y="134" width="18" height="20" fill="#141f2e" rx="2"/>
+              <!-- Right area -->
+              <rect x="122" y="35" width="40" height="30" fill="#141f2e" rx="3"/>
+              <rect x="122" y="72" width="18" height="22" fill="#16222f" rx="2"/>
+              <rect x="144" y="72" width="18" height="22" fill="#141f2e" rx="2"/>
+              <rect x="122" y="100" width="40" height="28" fill="#16222f" rx="3"/>
+              <rect x="122" y="134" width="18" height="20" fill="#141f2e" rx="2"/>
+              <rect x="144" y="134" width="18" height="20" fill="#16222f" rx="2"/>
+              <!-- Bottom section -->
+              <rect x="8" y="200" width="28" height="32" fill="#141f2e" rx="2"/>
+              <rect x="40" y="200" width="28" height="32" fill="#16222f" rx="2"/>
+              <rect x="8" y="238" width="28" height="26" fill="#16222f" rx="2"/>
+              <rect x="90" y="200" width="32" height="32" fill="#141f2e" rx="2"/>
+              <rect x="128" y="200" width="30" height="32" fill="#16222f" rx="2"/>
+              <rect x="164" y="200" width="32" height="32" fill="#141f2e" rx="2"/>
+              <rect x="202" y="200" width="60" height="32" fill="#16222f" rx="2"/>
+              <rect x="90" y="240" width="32" height="30" fill="#141f2e" rx="2"/>
+              <rect x="128" y="240" width="30" height="30" fill="#16222f" rx="2"/>
+              <rect x="164" y="240" width="32" height="30" fill="#141f2e" rx="2"/>
+              <rect x="202" y="240" width="60" height="30" fill="#16222f" rx="2"/>
+              <rect x="90" y="278" width="170" height="28" fill="#141f2e" rx="2"/>
+              <rect x="90" y="312" width="80" height="30" fill="#16222f" rx="2"/>
+              <rect x="178" y="312" width="82" height="30" fill="#141f2e" rx="2"/>
+              <rect x="90" y="350" width="80" height="28" fill="#141f2e" rx="2"/>
+              <rect x="178" y="350" width="82" height="28" fill="#16222f" rx="2"/>
+              <rect x="90" y="385" width="170" height="40" fill="#141f2e" rx="2"/>
+
+              <!-- Streets — horizontal -->
+              <line x1="0" y1="30"  x2="270" y2="30"  stroke="#1c2d40" stroke-width="5"/>
+              <line x1="0" y1="67"  x2="270" y2="67"  stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="96"  x2="270" y2="96"  stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="130" x2="270" y2="130" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="162" x2="270" y2="162" stroke="#243550" stroke-width="5.5"/>
+              <line x1="0" y1="196" x2="270" y2="196" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="236" x2="270" y2="236" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="274" x2="270" y2="274" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="308" x2="270" y2="308" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="346" x2="270" y2="346" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="0" y1="382" x2="270" y2="382" stroke="#1c2d40" stroke-width="3.5"/>
+
+              <!-- Streets — vertical -->
+              <line x1="0"   y1="0" x2="0"   y2="430" stroke="#1c2d40" stroke-width="5"/>
+              <line x1="62"  y1="0" x2="62"  y2="430" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="116" y1="0" x2="116" y2="430" stroke="#243550" stroke-width="5.5"/>
+              <line x1="162" y1="0" x2="162" y2="430" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="202" y1="0" x2="202" y2="430" stroke="#1c2d40" stroke-width="3.5"/>
+              <line x1="262" y1="0" x2="262" y2="430" stroke="#1c2d40" stroke-width="3.5"/>
+
+              <!-- Park trees dots -->
+              <circle cx="188" cy="50"  r="4" fill="#1a3a22" opacity="0.8"/>
+              <circle cx="202" cy="65"  r="3" fill="#1a3a22" opacity="0.8"/>
+              <circle cx="218" cy="50"  r="5" fill="#1a3a22" opacity="0.8"/>
+              <circle cx="235" cy="60"  r="3" fill="#1a3a22" opacity="0.8"/>
+              <circle cx="248" cy="45"  r="4" fill="#1a3a22" opacity="0.8"/>
+              <circle cx="192" cy="80"  r="3" fill="#1a3a22" opacity="0.8"/>
+              <circle cx="228" cy="82"  r="4" fill="#1a3a22" opacity="0.8"/>
+              <circle cx="245" cy="75"  r="3" fill="#1a3a22" opacity="0.8"/>
+
+              <!-- Water ripples -->
+              <ellipse cx="35" cy="360" rx="22" ry="10" fill="none" stroke="#1a3a5a" stroke-width="1.5" opacity="0.6"/>
+              <ellipse cx="35" cy="360" rx="14" ry="6"  fill="none" stroke="#1a3a5a" stroke-width="1" opacity="0.5"/>
+
+              <!-- Route line -->
+              <polyline points="72,108 72,162 116,162 116,265" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="5,4" opacity="0.6"/>
+
+              <!-- Gradient overlay top -->
+              <defs>
+                <linearGradient id="topFade" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"  stop-color="#0f1923" stop-opacity="0.95"/>
+                  <stop offset="30%" stop-color="#0f1923" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="botFade" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="60%" stop-color="#0f1923" stop-opacity="0"/>
+                  <stop offset="100%" stop-color="#0f1923" stop-opacity="0.7"/>
+                </linearGradient>
+              </defs>
+              <rect width="270" height="70" fill="url(#topFade)"/>
+              <rect y="360" width="270" height="70" fill="url(#botFade)"/>
+            </svg>
+
+            <!-- Animated pins over the map -->
+            <div class="map-pin-group you">
+              <div class="pin-label">You</div>
+              <div class="pin-pulse-ring green"></div>
+              <div class="pin-dot green"><span>Y</span></div>
+            </div>
+            <div class="map-pin-group alex">
+              <div class="pin-label">Alex</div>
+              <div class="pin-pulse-ring blue"></div>
+              <div class="pin-dot blue"><span>A</span></div>
+            </div>
+            <div class="map-pin-group priya">
+              <div class="pin-label">Priya</div>
+              <div class="pin-pulse-ring amber"></div>
+              <div class="pin-dot amber"><span>P</span></div>
+            </div>
+
+            <!-- Bottom info card -->
+            <div class="map-info-card">
+              <div class="mic-row">
+                <span class="mic-title">Connections</span>
+                <span class="mic-badge">2 active</span>
+              </div>
+              <div class="mic-persons">
+                <div class="mic-person">
+                  <div class="mic-avatar" style="background:#3b82f6">A</div>
+                  <span class="mic-name">Alex</span>
+                  <span class="mic-time">12m ago</span>
+                  <div class="mic-dot-live"></div>
+                </div>
+                <div class="mic-person">
+                  <div class="mic-avatar" style="background:#f59e0b">P</div>
+                  <span class="mic-name">Priya</span>
+                  <span class="mic-time">1h ago</span>
+                  <div class="mic-dot-live"></div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /phone-screen -->
+        </div><!-- /phone-mock -->
+      </div><!-- /phone-wrap -->
+    </div><!-- /hero-visual -->
   </main>
 
-  <section class="how-it-works">
-    <h2>How it works</h2>
+  <!-- Stats bar -->
+  <div class="stats-bar reveal">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Free forever</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value">3hr</div>
+        <div class="stat-label">Auto-update interval</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value">6</div>
+        <div class="stat-label">Digit share code</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Ads or trackers</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features grid -->
+  <section class="features-section reveal">
+    <p class="section-label">Why LocShare</p>
+    <h2 class="section-title">Everything you need, nothing you don't</h2>
+    <div class="features-grid">
+      <div class="feat-card">
+        <span class="feat-icon">🔗</span>
+        <h3>Share code, not your number</h3>
+        <p>Connect with a simple 6-digit code. No phone number, no email sharing required.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🗺️</span>
+        <h3>Live map view</h3>
+        <p>See all your connections plotted on an interactive map with real-time markers.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">⏰</span>
+        <h3>Auto-shares every 3 hours</h3>
+        <p>Set it and forget it. LocShare sends your location automatically while the app is open.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🔔</span>
+        <h3>Smart reminders</h3>
+        <p>Get a notification 5 minutes before your next auto-share so you're always aware.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📲</span>
+        <h3>Install like an app</h3>
+        <p>Add to your home screen on Android or iPhone — works offline, no Play Store needed.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🔒</span>
+        <h3>Fully private</h3>
+        <p>Only your connected people can see your location. No data sold, no third parties.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works reveal">
+    <p class="section-label">Getting started</p>
+    <h2 class="section-title">Live in 3 steps</h2>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
         <h3>Create account</h3>
-        <p>Sign up and get your unique share code.</p>
+        <p>Sign up in seconds and get your unique 6-digit share code.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <h3>Connect</h3>
-        <p>Enter a friend's share code to link accounts.</p>
+        <p>Share your code with someone — or enter theirs to link up.</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3>Share location</h3>
-        <p>Your location is sent automatically every 3 hours.</p>
+        <h3>See each other</h3>
+        <p>Your locations appear on the map. Auto-updates every 3 hours.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section reveal">
+    <div class="cta-card">
+      <h2>Ready to stay connected?</h2>
+      <p>Free forever. No credit card. No Play Store. Just open and go.</p>
+      <div class="cta-actions">
+        <a href="/register.html" class="btn-primary-glow">Create free account →</a>
+        <a href="/login.html" class="btn-ghost-hero">Sign in</a>
       </div>
     </div>
   </section>
@@ -85,6 +923,35 @@
 
   <script src="/js/api.js"></script>
   <script src="/js/pwa.js"></script>
-  <script>redirectIfLoggedIn();</script>
+  <script>
+    redirectIfLoggedIn();
+
+    // Floating background pins
+    const pinEmojis = ['📍','📌','🗺️','🧭','📡'];
+    const bgPins = document.getElementById('bgPins');
+    for (let i = 0; i < 18; i++) {
+      const el = document.createElement('div');
+      el.className = 'bg-pin';
+      el.textContent = pinEmojis[i % pinEmojis.length];
+      el.style.left  = (Math.random() * 100) + '%';
+      el.style.top   = (20 + Math.random() * 75) + '%';
+      el.style.animationDelay    = (Math.random() * 10) + 's';
+      el.style.animationDuration = (10 + Math.random() * 8) + 's';
+      el.style.fontSize = (0.9 + Math.random() * 0.8) + 'rem';
+      bgPins.appendChild(el);
+    }
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => observer.observe(el));
+  </script>
 </body>
 </html>
