@@ -1,11 +1,26 @@
 node_modules
 npm-debug.log
+*.log
+
+# Secrets / env
 .env
 .env.local
-locshare.db
+.env.*
+
+# Database — the data dir (DATA_DIR=./data) and any .db file, at any depth.
+# Plain "*.db" only matches the root, so the DB under data/ was leaking into the image.
+data/
 *.db
+**/*.db
+
+# VCS / editor / docs (not needed in the image)
 .git
 .gitignore
 .cursor
 README.md
 DEPLOY.md
+
+# Stray local artifacts
+scratchpad-post-visual.html
+Dockerfile
+.dockerignore

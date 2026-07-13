@@ -65,8 +65,8 @@ async function requestNotificationPermission() {
 function sendShareReminder() {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   if (document.visibilityState === 'visible') return;
-  new Notification('LocShare — Time to share location', {
-    body: 'Tap to open LocShare and update your live location.',
+  new Notification('PinLoc — Time to share location', {
+    body: 'Tap to open PinLoc and update your live location.',
     icon: '/icons/icon.svg',
     tag: 'locshare-reminder',
     renotify: true

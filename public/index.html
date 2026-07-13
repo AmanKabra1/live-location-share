@@ -11,7 +11,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon.svg">
-  <title>LocShare — Live Location Sharing</title>
+  <title>PinLoc — Live Location Sharing</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ── Landing page overrides & new styles ── */
@@ -31,14 +31,8 @@
     .bg-pin {
       position: absolute;
       font-size: 1.4rem;
-      opacity: 0;
-      animation: floatPin 12s ease-in-out infinite;
-    }
-    @keyframes floatPin {
-      0%   { opacity: 0; transform: translateY(0) scale(0.8); }
-      15%  { opacity: 0.18; }
-      85%  { opacity: 0.18; }
-      100% { opacity: 0; transform: translateY(-80px) scale(1.1); }
+      opacity: 0.12;
+      /* static — no floating animation */
     }
 
     /* Nav */
@@ -111,12 +105,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      background-size: 200% 200%;
-      animation: gradShift 4s ease infinite;
-    }
-    @keyframes gradShift {
-      0%,100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+      /* static gradient — no shimmer animation */
     }
 
     .hero-sub {
@@ -578,13 +567,15 @@
     /* Scroll reveal */
     .reveal {
       opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
+      transition: opacity 0.5s ease;
     }
     .reveal.visible {
       opacity: 1;
-      transform: translateY(0);
     }
+
+    /* Keep everything static — no motion on the page */
+    .live-dot, .mic-dot-live { animation: none !important; }
+    .pin-pulse-ring { display: none !important; }
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -618,7 +609,7 @@
   <nav class="nav">
     <a href="/" class="logo">
       <span class="logo-icon">📍</span>
-      <span>LocShare</span>
+      <span>PinLoc</span>
     </a>
     <div class="nav-links">
       <a href="/login.html" class="btn btn-ghost">Log in</a>
@@ -663,7 +654,7 @@
 
             <!-- Map header -->
             <div class="map-header">
-              <span class="map-app-name">📍 LOCSHARE</span>
+              <span class="map-app-name">📍 PINLOC</span>
               <span class="map-live-tag">● LIVE</span>
             </div>
 
@@ -847,7 +838,7 @@
 
   <!-- Features grid -->
   <section class="features-section reveal">
-    <p class="section-label">Why LocShare</p>
+    <p class="section-label">Why PinLoc</p>
     <h2 class="section-title">Everything you need, nothing you don't</h2>
     <div class="features-grid">
       <div class="feat-card">
@@ -863,7 +854,7 @@
       <div class="feat-card">
         <span class="feat-icon">⏰</span>
         <h3>Auto-shares every 3 hours</h3>
-        <p>Set it and forget it. LocShare sends your location automatically while the app is open.</p>
+        <p>Set it and forget it. PinLoc sends your location automatically while the app is open.</p>
       </div>
       <div class="feat-card">
         <span class="feat-icon">🔔</span>
@@ -919,7 +910,7 @@
   </section>
 
   <footer class="footer">
-    <p>LocShare — Private location sharing for people you trust.</p>
+    <p>PinLoc — Private location sharing for people you trust.</p>
   </footer>
 
   <script src="/js/api.js"></script>

@@ -1,4 +1,4 @@
-# LocShare — Deploy on Render
+# PinLoc — Deploy on Render
 
 Render builds your existing `Dockerfile` directly — no code changes needed.
 
@@ -57,7 +57,7 @@ Render builds your existing `Dockerfile` directly — no code changes needed.
 ```
 https://your-app.onrender.com/api/health
 ```
-Should return `{"status":"ok","service":"LocShare","pwa":true}`.
+Should return `{"status":"ok","service":"PinLoc","pwa":true}`.
 
 ---
 
@@ -84,7 +84,7 @@ Open your HTTPS Render URL on your phone:
 1. Open site → log in
 2. Tap **Share** → **Add to Home Screen**
 
-LocShare opens full-screen like an app. Allow **Location** and **Notifications** when asked.
+PinLoc opens full-screen like an app. Allow **Location** and **Notifications** when asked.
 
 ---
 

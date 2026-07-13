@@ -1,4 +1,4 @@
-const CACHE = 'locshare-v1';
+const CACHE = 'pinloc-v1';
 const ASSETS = [
   '/',
   '/index.html',

@@ -28,7 +28,7 @@ app.use('/api/connections', connectionRoutes);
 app.use('/api/locations', locationRoutes);
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'LocShare', pwa: true });
+  res.json({ status: 'ok', service: 'PinLoc', pwa: true });
 });
 
 app.get('*', (_req, res) => {
@@ -36,5 +36,5 @@ app.get('*', (_req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n  LocShare is running on port ${PORT}\n`);
+  console.log(`\n  PinLoc is running on port ${PORT}\n`);
 });

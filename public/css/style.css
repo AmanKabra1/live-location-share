@@ -411,6 +411,7 @@ a:hover { text-decoration: underline; }
 
 .connect-form {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
@@ -633,3 +634,42 @@ a:hover { text-decoration: underline; }
   .dash-header { padding-top: max(0.65rem, env(safe-area-inset-top)); }
   .map-legend { bottom: max(1.5rem, env(safe-area-inset-bottom)); }
 }
+
+/* ── No accidental horizontal scrolling anywhere ── */
+html, body { max-width: 100%; overflow-x: hidden; }
+
+/* ── Keep text inside its boxes (no overflow on mobile) ── */
+.conn-item { gap: 0.5rem; }
+.conn-info { min-width: 0; flex: 1; overflow: hidden; }
+.conn-name,
+.conn-time {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conn-actions { flex-shrink: 0; }
+.toast-msg { word-break: break-word; overflow-wrap: anywhere; }
+.panel-desc { overflow-wrap: anywhere; }
+.share-code-box { flex-wrap: wrap; gap: 0.5rem; }
+#shareCode { overflow-wrap: anywhere; }
+
+/* ── Location-sharing toggle button + states ── */
+.btn-danger { background: var(--error); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+
+.share-panel.sharing-active {
+  border-color: rgba(16,185,129,0.5);
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.25);
+}
+.share-panel.sharing-paused {
+  border-color: rgba(148,163,184,0.4);
+}
+
+/* Brief highlight flash when the toggle is pressed */
+@keyframes pressFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(59,130,246,0.55); }
+  100% { box-shadow: 0 0 0 14px rgba(59,130,246,0); }
+}
+.press-flash { animation: pressFlash 0.55s ease-out; }

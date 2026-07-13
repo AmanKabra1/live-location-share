@@ -11,6 +11,7 @@ let refreshTimer = null;
 let nextShareAt = null;
 let countdownTimer = null;
 let reminderTimer = null;
+let sharingEnabled = localStorage.getItem('locshare_sharing_enabled') !== 'false';
 
 const user = getUser();
 document.getElementById('userName').textContent = user?.username || 'User';
@@ -32,21 +33,85 @@ async function init() {
   setupNotifyButton();
   initMap();
   await loadConnections();
-  restoreNextShare();
 
-  if (!nextShareAt || Date.now() >= nextShareAt) {
-    await shareLocation(true);
+  updateSharingUI();
+
+  if (sharingEnabled) {
+    restoreNextShare();
+    if (!nextShareAt || Date.now() >= nextShareAt) {
+      await shareLocation(true);
+    } else {
+      scheduleNextShare(false);
+    }
+    startAutoShare();
   } else {
-    scheduleNextShare(false);
+    showPausedStatus();
   }
 
-  startAutoShare();
   startRefresh();
   setupVisibilityHandler();
 
   document.getElementById('connectForm').addEventListener('submit', handleConnect);
   document.getElementById('shareNowBtn').addEventListener('click', () => shareLocation(false));
+  document.getElementById('toggleShareBtn').addEventListener('click', () => setSharing(!sharingEnabled, true));
   document.getElementById('copyCodeBtn').addEventListener('click', copyShareCode);
+}
+
+// ── Start / stop location sharing (with visual feedback) ──
+function setSharing(enabled, fromClick) {
+  sharingEnabled = enabled;
+  localStorage.setItem('locshare_sharing_enabled', String(enabled));
+
+  if (enabled) {
+    startAutoShare();
+    if (!nextShareAt || Date.now() >= nextShareAt) {
+      shareLocation(false);
+    } else {
+      scheduleNextShare(false);
+    }
+  } else {
+    if (shareTimer) clearInterval(shareTimer);
+    if (countdownTimer) clearInterval(countdownTimer);
+    if (reminderTimer) clearTimeout(reminderTimer);
+    showPausedStatus();
+  }
+
+  updateSharingUI(fromClick);
+}
+
+function showPausedStatus() {
+  const statusEl = document.getElementById('shareStatus');
+  if (statusEl) {
+    statusEl.innerHTML = '<span class="status-dot idle"></span><span>Sharing is off</span>';
+  }
+  const ns = document.getElementById('nextShare');
+  if (ns) ns.textContent = 'Auto-share is paused';
+}
+
+function updateSharingUI(flash) {
+  const btn = document.getElementById('toggleShareBtn');
+  const panel = document.getElementById('sharePanel');
+  if (!btn) return;
+
+  if (sharingEnabled) {
+    btn.textContent = '⏸ Stop sharing';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-danger');
+    panel?.classList.add('sharing-active');
+    panel?.classList.remove('sharing-paused');
+  } else {
+    btn.textContent = '▶ Start sharing';
+    btn.classList.remove('btn-danger');
+    btn.classList.add('btn-primary');
+    panel?.classList.add('sharing-paused');
+    panel?.classList.remove('sharing-active');
+  }
+
+  if (flash) {
+    btn.classList.remove('press-flash');
+    void btn.offsetWidth; // restart the animation
+    btn.classList.add('press-flash');
+  }
 }
 
 function setupNotifyButton() {
@@ -97,7 +162,17 @@ function setupVisibilityHandler() {
 }
 
 function initMap() {
-  map = L.map('map', { zoomControl: true }).setView([20.5937, 78.9629], 5);
+  // Map stays fixed — no dragging/scroll/pinch panning. Zoom via the +/- buttons
+  // still works, and the view still auto-fits to your connections.
+  map = L.map('map', {
+    zoomControl: true,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    touchZoom: false
+  }).setView([20.5937, 78.9629], 5);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
@@ -221,7 +296,7 @@ async function shareLocation(silent = false) {
     showSelfMarker(latitude, longitude, address);
 
     statusEl.innerHTML = '<span class="status-dot active"></span><span>Location shared successfully</span>';
-    scheduleNextShare();
+    if (sharingEnabled) scheduleNextShare();
     await loadConnections();
   } catch (err) {
     statusEl.innerHTML = `<span class="status-dot error"></span><span>${escapeHtml(err.message)}</span>`;

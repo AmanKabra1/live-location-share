@@ -6,3 +6,8 @@ locshare.db
 npm-debug.log
 .DS_Store
 Thumbs.db
+
+# Local dev / marketing artifacts (not part of the app)
+PinLoc-post/
+LocShare-post/
+scratchpad-post-visual.html

@@ -1,6 +1,6 @@
 {
-  "name": "LocShare — Live Location Sharing",
-  "short_name": "LocShare",
+  "name": "PinLoc — Live Location Sharing",
+  "short_name": "PinLoc",
   "description": "Connect with people you trust and share your live location every 3 hours.",
   "start_url": "/dashboard.html",
   "scope": "/",

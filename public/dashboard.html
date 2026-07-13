@@ -9,18 +9,18 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="LocShare">
+  <meta name="apple-mobile-web-app-title" content="PinLoc">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon.svg">
-  <title>Dashboard — LocShare</title>
+  <title>Dashboard — PinLoc</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="dashboard-page">
   <div id="pwaInstallBanner" class="pwa-banner hidden">
     <div class="pwa-banner-text">
-      <strong>Install LocShare</strong>
+      <strong>Install PinLoc</strong>
       <span>Add to home screen for app-like experience on mobile</span>
     </div>
     <button class="btn btn-primary btn-sm" onclick="installPWA()">Install</button>
@@ -30,7 +30,7 @@
   <header class="dash-header">
     <a href="/" class="logo">
       <span class="logo-icon">📍</span>
-      <span>LocShare</span>
+      <span>PinLoc</span>
     </a>
     <div class="header-right">
       <span class="user-greeting">Hi, <strong id="userName">—</strong></span>
@@ -42,7 +42,7 @@
     <aside class="sidebar">
       <section class="panel pwa-panel" id="pwaTips">
         <h2>Mobile app (free)</h2>
-        <p class="panel-desc">Install LocShare on your phone — no Play Store needed.</p>
+        <p class="panel-desc">Install PinLoc on your phone — no Play Store needed.</p>
         <button class="btn btn-outline btn-full btn-sm" onclick="installPWA()">Add to Home Screen</button>
         <button class="btn btn-ghost btn-full btn-sm" id="notifyBtn" style="margin-top:0.5rem">Enable reminders</button>
       </section>
@@ -65,14 +65,15 @@
         <div id="connectMsg" class="toast-msg hidden"></div>
       </section>
 
-      <section class="panel">
+      <section class="panel share-panel" id="sharePanel">
         <h2>Location sharing</h2>
         <div class="share-status" id="shareStatus">
           <span class="status-dot idle"></span>
           <span>Waiting to share…</span>
         </div>
-        <p class="panel-desc">Your location is sent automatically every <strong>3 hours</strong>. Keep LocShare open or installed on your phone.</p>
+        <p class="panel-desc">Your location is sent automatically every <strong>3 hours</strong>. Keep PinLoc open or installed on your phone.</p>
         <button class="btn btn-primary btn-full" id="shareNowBtn">Share location now</button>
+        <button class="btn btn-danger btn-full" id="toggleShareBtn" style="margin-top:0.5rem">⏸ Stop sharing</button>
         <p class="next-share" id="nextShare">Next auto-share: —</p>
       </section>
 

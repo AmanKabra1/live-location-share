@@ -1,4 +1,4 @@
-# LocShare — Tech Stack
+# PinLoc — Tech Stack
 
 ## Backend
 
