@@ -1,0 +1,340 @@
+<title>LocShare — Ab Woh Lambi Raatein Khatam</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --ink: #eaf1fb;
+    --ink-dim: #94a7c2;
+    --bg: #070d17;
+    --bg-2: #0d1524;
+    --panel: #131e30;
+    --line: rgba(255,255,255,0.09);
+    --blue: #3b82f6;
+    --blue-2: #6366f1;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --chat-bg: #0b141a;
+    --bubble-in: #1f2c33;
+    --bubble-out: #144d37;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 700px at 80% -10%, rgba(59,130,246,0.16), transparent 60%),
+      radial-gradient(900px 600px at 0% 110%, rgba(16,185,129,0.10), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 60px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  /* ── Header ── */
+  .head {
+    text-align: center;
+    padding: 6px 4px 0;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    font-size: 0.82rem;
+    color: var(--blue);
+    text-transform: uppercase;
+  }
+  .head h1 {
+    margin: 12px 0 8px;
+    font-size: 1.9rem;
+    line-height: 1.12;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .head h1 .grad {
+    background: linear-gradient(120deg, #60a5fa, #a78bfa, #22d3ee);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .head p {
+    margin: 0 auto;
+    max-width: 340px;
+    color: var(--ink-dim);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  /* ── Phone frame ── */
+  .phone {
+    align-self: center;
+    width: 300px;
+    background: linear-gradient(150deg, #1b2636, #10192a);
+    border-radius: 34px;
+    padding: 9px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 26px 70px rgba(0,0,0,0.6);
+  }
+  .notch {
+    width: 92px; height: 20px;
+    background: #060a12;
+    border-radius: 0 0 12px 12px;
+    margin: 0 auto 8px;
+  }
+  .screen {
+    border-radius: 26px;
+    overflow: hidden;
+    background: var(--chat-bg);
+  }
+
+  /* ── WhatsApp-style chat ── */
+  .wa-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 13px;
+    background: #1f2c33;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+  }
+  .wa-ava {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-2));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.9rem;
+  }
+  .wa-name { font-weight: 700; font-size: 0.9rem; }
+  .wa-sub { font-size: 0.68rem; color: var(--green); }
+
+  .chat {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    background:
+      linear-gradient(rgba(11,20,26,0.94), rgba(11,20,26,0.94));
+    min-height: 300px;
+  }
+  .msg {
+    max-width: 82%;
+    padding: 8px 11px;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    border-radius: 12px;
+    position: relative;
+  }
+  .msg .t {
+    display: block;
+    font-size: 0.58rem;
+    color: rgba(255,255,255,0.45);
+    text-align: right;
+    margin-top: 3px;
+  }
+  .in {
+    background: var(--bubble-in);
+    align-self: flex-start;
+    border-top-left-radius: 3px;
+  }
+  .out {
+    background: var(--bubble-out);
+    align-self: flex-end;
+    border-top-right-radius: 3px;
+  }
+  .out .t { color: rgba(180,240,210,0.6); }
+
+  /* location share bubble */
+  .loc-card {
+    align-self: flex-end;
+    max-width: 82%;
+    background: var(--bubble-out);
+    border-radius: 12px;
+    border-top-right-radius: 3px;
+    padding: 6px 6px 8px;
+  }
+  .loc-map {
+    height: 96px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 15px, rgba(255,255,255,0.03) 15px 16px),
+      repeating-linear-gradient(90deg, transparent 0 15px, rgba(255,255,255,0.03) 15px 16px),
+      #0f1e2e;
+  }
+  .loc-route {
+    position: absolute; top: 20px; left: 30px;
+    width: 120px; height: 2px;
+    background: repeating-linear-gradient(90deg, var(--blue) 0 6px, transparent 6px 11px);
+    transform: rotate(28deg);
+    transform-origin: left;
+  }
+  .loc-pin {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+  .loc-pin.a { background: var(--green); bottom: 24px; right: 40px; }
+  .loc-pin.b { background: var(--blue); top: 22px; left: 44px; }
+  .loc-cap {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; padding: 7px 5px 2px; color: #cfe8db;
+  }
+  .loc-cap b { color: #fff; }
+
+  .typing {
+    align-self: flex-start;
+    background: var(--bubble-in);
+    border-radius: 12px;
+    border-top-left-radius: 3px;
+    padding: 10px 13px;
+    display: flex; gap: 4px;
+  }
+  .typing i {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    animation: blink 1.2s infinite;
+  }
+  .typing i:nth-child(2){ animation-delay: 0.2s; }
+  .typing i:nth-child(3){ animation-delay: 0.4s; }
+  @keyframes blink { 0%,60%,100%{opacity:0.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-3px)} }
+
+  /* ── Feature strip ── */
+  .feats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .feat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 13px 13px;
+  }
+  .feat .fi { font-size: 1.25rem; }
+  .feat h3 { margin: 7px 0 3px; font-size: 0.82rem; font-weight: 700; }
+  .feat p { margin: 0; font-size: 0.72rem; color: var(--ink-dim); line-height: 1.4; }
+
+  /* ── CTA ── */
+  .cta {
+    background: linear-gradient(135deg, rgba(59,130,246,0.16), rgba(139,92,246,0.13));
+    border: 1px solid rgba(59,130,246,0.28);
+    border-radius: 18px;
+    padding: 20px 18px;
+    text-align: center;
+  }
+  .cta h2 { margin: 0 0 5px; font-size: 1.05rem; font-weight: 800; }
+  .cta p { margin: 0 0 14px; font-size: 0.8rem; color: var(--ink-dim); }
+  .btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--blue), var(--blue-2));
+    color: #fff; text-decoration: none;
+    font-weight: 700; font-size: 0.85rem;
+    padding: 10px 22px; border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.4);
+  }
+  .foot {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+  }
+  .tags { color: var(--blue); font-weight: 600; }
+
+  @media (max-width: 380px) {
+    .phone { width: 260px; }
+  }
+</style>
+
+<div class="card">
+
+  <div class="head">
+    <span class="brand">📍 LocShare</span>
+    <h1>Ab woh lambi raatein<br><span class="grad">khatam — sabki location, one map</span></h1>
+    <p>A 6-digit code. A live map. Auto-share every 3 hours. Bas itna hi — no number, no drama, no tracking-shacking.</p>
+  </div>
+
+  <!-- Phone: WhatsApp chat mockup -->
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="wa-top">
+        <div class="wa-ava">M</div>
+        <div>
+          <div class="wa-name">Mummy 🏠</div>
+          <div class="wa-sub">online</div>
+        </div>
+      </div>
+
+      <div class="chat">
+        <div class="msg in">Beta kaha hai?? Raat ke 11 baj gaye 😤<span class="t">11:02 PM</span></div>
+        <div class="msg out">Bas 5 min me aata hu 🙏<span class="t">11:03 PM ✓✓</span></div>
+        <div class="msg in">Ye "5 min" 3 ghante pehle bhi bola tha 🙂<span class="t">11:03 PM</span></div>
+
+        <!-- location share -->
+        <div class="loc-card">
+          <div class="loc-map">
+            <div class="loc-route"></div>
+            <div class="loc-pin b"></div>
+            <div class="loc-pin a"></div>
+          </div>
+          <div class="loc-cap">📍 <span><b>Live on LocShare</b> · updated 2m ago · on the way home</span></div>
+        </div>
+        <div class="msg out">Tension mat lo mummy — LocShare pe live pin dekh lo 😎<span class="t">11:04 PM ✓✓</span></div>
+
+        <div class="msg in">Chalo ab dikh raha hai. Ab jhooth mat bolna 🤣<span class="t">11:04 PM</span></div>
+
+        <div class="typing"><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature strip -->
+  <div class="feats">
+    <div class="feat">
+      <span class="fi">🔗</span>
+      <h3>6-digit code</h3>
+      <p>Number nahi, bas code. Share karo, connect ho jao.</p>
+    </div>
+    <div class="feat">
+      <span class="fi">🗺️</span>
+      <h3>Live map</h3>
+      <p>Green tum, blue dost, grey woh jo gayab hai.</p>
+    </div>
+    <div class="feat">
+      <span class="fi">⏰</span>
+      <h3>Auto har 3 ghante</h3>
+      <p>Set karo, bhool jao. Khud share hoti hai.</p>
+    </div>
+    <div class="feat">
+      <span class="fi">🔒</span>
+      <h3>Fully private</h3>
+      <p>Sirf connected log. No ads, no data bechna.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>100% free · No Play Store · Bas kholo aur chalao</h2>
+    <p>Phone pe "Add to Home Screen" — app ban jayega. Offline bhi.</p>
+    <a class="btn" href="#">Create free account →</a>
+  </div>
+
+  <div class="foot">
+    <span class="tags">#LocShare #LiveLocation #MadeInIndia #SideProject</span>
+  </div>
+
+</div>
