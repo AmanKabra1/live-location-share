@@ -4,3 +4,5 @@ Allow: /login.html
 Allow: /register.html
 Disallow: /dashboard.html
 Disallow: /api/
+
+Sitemap: https://live-location-share-yph1.onrender.com/sitemap.xml
